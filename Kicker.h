@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+//класс биты
 using namespace std;
 class Kicker
 {

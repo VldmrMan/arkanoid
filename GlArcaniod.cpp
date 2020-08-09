@@ -2,6 +2,9 @@
 #include "Rock.h"
 #include "Kicker.h"
 #include "Setting.h"
+#include "Ball.h"
+
+#include "Collision.cpp"
 
 #include "glut.h"
 #include <iostream>
@@ -10,12 +13,22 @@
 #include <algorithm>
 #include <clocale>
 
-
-
 using namespace std;
 
 //игровые настройки
-GameSetting* _gamesetting = new GameSetting(800, 600, 3, 3, 10, 10, 10, true);
+GameSetting* _gamesetting = new GameSetting(960, 700, 15, 15, 10, 15, 10, true);
+Kicker* _kicker = new Kicker(_gamesetting->wight / 2 - (_gamesetting->wight / 10) / 2, _gamesetting->hight - 15, _gamesetting->wight / 10, 15);
+vector <Rock*>* map = new vector<Rock*>;
+Ball* _ball = new Ball(
+
+	_gamesetting->range,
+	_gamesetting->wight / 2,
+	_gamesetting->hight - 15 - _gamesetting->range,
+	_gamesetting->wight,
+	_gamesetting->hight,
+	_gamesetting->speedx,
+	_gamesetting->speedy
+);
 //генератор камней на поле
 void generator(vector <Rock*>* map, int columns, int row, float wight, float hight) {
 
@@ -55,159 +68,7 @@ void generator(vector <Rock*>* map, int columns, int row, float wight, float hig
 
 
 };
-//описания шарика, и событий передвижения
-class Ball
-{
-public:
-	float x, y, //координаты
-		dx, dy, // скорость
-		r;		//радиус
 
-	float wight;
-	float hight;
-
-	float speedx;
-	float speedy;
-
-	vector <Rock*>* map;
-	Kicker* kicker;
-
-	bool active;
-	Ball(float r, float x, float y,
-		float wight, float hight,
-		vector <Rock*>* map, Kicker* kicker,
-		float speedx, float speedy)
-	{
-		this->r = r;
-		this->x = x;
-		this->y = y;
-		
-		this->wight = wight;
-		this->hight = hight;
-
-		this->map = map;
-		this->kicker = kicker;
-
-
-	}
-
-	void move()
-	{		//проверка на столкновения
-		_rocksСollision(this->map);
-		_kickerСollision(this->kicker);
-		_borderСollision();
-		//обновление координа (движение)
-		x += dx;
-		y += dy;
-	}
-
-	void stopmove()
-	{
-		//нулевая скорость шара (при переигрывании)
-		dx = 0;
-		dy = 0;
-	}
-
-	void _borderСollision()
-	{
-		//првоерка на столкновение с рамкой 
-
-		if (y - r <= 0)
-			if (dy < 0)
-			{
-				dy *= -1;
-		
-			}
-
-		if (x - r <= 0)
-			if (dx < 0)
-			{
-				dx *= -1;
-		
-			}
-		if (x + r >= wight)
-			if (dx > 0)
-			{
-				dx *= -1;
-		
-			}
-		if (y - 4 * r > hight)
-		{
-			
-			generator(map, _gamesetting->columns, _gamesetting->rows, _gamesetting->wight, _gamesetting->hight);
-			stopmove();
-			active = false;
-
-
-			x = kicker->pointx + (_gamesetting->wight / 10)/2 ;
-			y = kicker->pointy - _gamesetting->range ;
-
-		
-		}
-	}
-
-	void _kickerСollision(Kicker* kicker)
-	{
-		//Проверка столкновения с битой
-		if ((y < kicker->pointy && y + r + speedy  > kicker->pointy))
-			if (x > kicker->pointx - r && x < kicker->pointx + kicker->wight + r)
-				if (dy > 0)
-					dy *= -1;
-	}
-
-	void _rockСollision(Rock* _rock)
-	{
-		//проверка на столкновение с камнем
-
-		int top;
-		int bot;
-		int right;
-		int left;
-		int minimum;
-
-		//если камень живой,
-		//если центр шарика на расстоянии радиуса от границ
-		//тога вычисляются растояния до центров ребер до центра шарика
-		if (_rock->live)
-			if (_rock->x1 < x + r && x - r < _rock->x1 + _rock->w)
-				if (_rock->y1 < y + r && y - r < _rock->y1 + _rock->h)
-				{
-					top = abs(y - _rock->y1);
-					bot = abs(y - _rock->y1 + _rock->h);
-
-					left = abs(x - _rock->x1);
-					right = abs(x - _rock->x1 + _rock->w);
-
-					//находится минимальное расстояние
-					minimum = min(min(top, bot), min(right, left));
-					//шарик отражается от стороны< с минимальным расстоянием до шарика
-					if (minimum == top || minimum == bot)
-						dy *= -1;
-
-					else
-						dx *= -1;
-
-					//консольный вывод расчетво ближайшей стороны
-
-					/*
-					cout << "top = " << top << "  bot = " << bot << "  left = " << left << " right = " << right << endl;
-					cout << "Minimum = " << minimum << endl;
-					*/
-
-					//камень умирает после соприкосновения
-					_rock->live = false;
-				}
-	}
-
-	void _rocksСollision(vector <Rock*>* _rocks)
-
-	{
-		//колизия с камнем для коллекции камней
-		for (int i = 0; i < _rocks->size(); i++)
-			_rockСollision(_rocks->at(i));
-	};
-
-};
 //отображение одноо камня
 void showRock(Rock* _rock) {
 
@@ -231,20 +92,6 @@ void showRocks(vector <Rock*>* _map) {
 
 };
 //объекты игры
-Kicker* _kicker = new Kicker(_gamesetting->wight / 2 - (_gamesetting->wight / 10 )/2 ,_gamesetting->hight -15 ,_gamesetting->wight / 10, 15);
-vector <Rock*>* map = new vector<Rock*>;
-Ball* _ball = new Ball(
-
-	_gamesetting->range,
-	_gamesetting->wight / 2,
-	 _gamesetting->hight - 15  - _gamesetting->range,
-	_gamesetting->wight,
-	_gamesetting->hight,
-	map,_kicker,
-	_gamesetting->speedx,
-	_gamesetting->speedy
-
-);
 
 
 //отрисовка
@@ -260,7 +107,7 @@ void Draw() {
 	glRectf(_kicker->pointx, _kicker->pointy, _kicker->pointx + _kicker->wight, _kicker->pointy + _kicker->hight);
 
 	//шарик
-	glColor3f(1.0, 0.0, 0.0);
+	glColor3f(1.0, 0.3, 0.0);
 	glBegin(GL_POLYGON);
 	for (float i = 0; i < 2 * 3.14; i += 3.14 / 4)
 	{
@@ -271,15 +118,29 @@ void Draw() {
 	glutSwapBuffers();
 
 
+
+
 };
 //тикер
-void Timer(int) {
-
+void Timer(int) {	
 	if (_ball->active)
-		_ball->move();
-	Draw();
-	glutTimerFunc(5, Timer, 500);
+	{
 
+		if(
+		_borderСollision(_ball, _kicker, _gamesetting))
+		//retry
+		generator(map, _gamesetting->columns, _gamesetting->rows, _gamesetting->wight, _gamesetting->hight);
+
+
+		_kickerСollision(_kicker, _ball);
+		_rocksСollision(map,_ball);
+
+
+		_ball->move();
+	}
+
+	Draw();
+	glutTimerFunc(30, Timer, 500);
 };
 //двжиение мыши
 void Mouse(int ax, int ay) {
@@ -351,9 +212,8 @@ void ProcessNormalKeys(unsigned char key, int x, int y) {
 		if (!_ball->active)
 		{
 			_ball->active = true;
-
-			_ball->dx -= _gamesetting->speedx;
-			_ball->dy = _gamesetting->speedy;
+			_ball->dx = _gamesetting->speedx;
+			_ball->dy = -_gamesetting->speedy;
 
 		}
 	}
@@ -372,7 +232,6 @@ int main(int argc, char **argv)
 {
 	//запуска генератора впервые
 	generator(map, _gamesetting->columns, _gamesetting->rows, _gamesetting->wight, _gamesetting->hight);
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(_gamesetting-> wight, _gamesetting->hight);
@@ -381,6 +240,7 @@ int main(int argc, char **argv)
 	glutDisplayFunc(Draw);
 	glutTimerFunc(0, Timer, 0);
 
+
 	if (_gamesetting->mouseinput) {  //опциональное включения игры с клавиатуры
 		glutPassiveMotionFunc(Mouse);
 		glutMouseFunc(MousePress);
@@ -388,16 +248,11 @@ int main(int argc, char **argv)
 	else {
 		glutKeyboardFunc(ProcessNormalKeys);
 	}
+	
 
 	Init();
 	glutMainLoop();
-
-
-	return 0;
-
-
 	
-
-
+	return 0;
 
 }

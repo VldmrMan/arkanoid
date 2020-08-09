@@ -1,5 +1,5 @@
 #pragma once
-
+//класс игровых натсроек
 class GameSetting {
 
 public:
@@ -13,9 +13,9 @@ public:
 	int columns;
 	int rows;
 	int range;
-	//ввод
+	//тип вводв
 	bool mouseinput;
-	//платформа
+
 	
 
 	GameSetting(
