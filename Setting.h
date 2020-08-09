@@ -3,6 +3,7 @@
 class GameSetting {
 
 public:
+
 	//экран
 	int wight;
 	int hight;
@@ -14,9 +15,7 @@ public:
 	int rows;
 	int range;
 	//тип вводв
-	bool mouseinput;
-
-	
+	bool mouseinput;	
 
 	GameSetting(
 
@@ -27,30 +26,12 @@ public:
 		int speedy,
 		int range,
 
-	int columns,
-	int rows,
+		int columns,
+		int rows,
 
-	bool mouseinput
+		bool mouseinput);
 
-	)
-
-	{
-		this->wight = wight;
-		this->hight = hight;
-
-		this->speedx = speedx;
-		this->speedy = speedy;
-		this->range = range;
-
-		this->columns = columns;
-		this->rows = rows;
-
-		this->mouseinput = mouseinput;
-
-	};
-
-	~GameSetting() {
-		std::cout << "Distructor GameSetting complited" << std::endl;
-	};
+	~GameSetting();
 
 };
+

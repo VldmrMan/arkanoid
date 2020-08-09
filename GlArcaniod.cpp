@@ -16,7 +16,7 @@
 using namespace std;
 
 //игровые настройки
-GameSetting* _gamesetting = new GameSetting(960, 700, 15, 15, 10, 15, 10, true);
+GameSetting* _gamesetting = new GameSetting(960, 700, 5, 5, 10, 15, 10, true);
 Kicker* _kicker = new Kicker(_gamesetting->wight / 2 - (_gamesetting->wight / 10) / 2, _gamesetting->hight - 15, _gamesetting->wight / 10, 15);
 vector <Rock*>* map = new vector<Rock*>;
 Ball* _ball = new Ball(
