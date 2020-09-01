@@ -7,7 +7,7 @@
 #include <vector>
 #include <algorithm>
 
-bool _borderСollision(Ball* _ball, Kicker* _kicker, GameSetting* _gamesetting)
+bool _borderCollision(Ball* _ball, Kicker* _kicker, GameSetting* _gamesetting)
 {
 	//вовзращаемое значение:
 	//если каши\рик упал < сгенерировать новую карту
@@ -54,7 +54,7 @@ bool _borderСollision(Ball* _ball, Kicker* _kicker, GameSetting* _gamesetting)
 	return 0;
 }
 
-void _kickerСollision(Kicker* _kicker, Ball* _ball )
+void _kickerCollision(Kicker* _kicker, Ball* _ball )
 {
 	//Проверка столкновения с битой
 	if ((_ball->y < _kicker->pointy && _ball->y + _ball->r + _ball->dy  > _kicker->pointy))
@@ -63,7 +63,7 @@ void _kickerСollision(Kicker* _kicker, Ball* _ball )
 				_ball->dy *= -1;
 }
 
-void _rockСollision(Rock* _rock, Ball* _ball)
+void _rockCollision(Rock* _rock, Ball* _ball)
 {
 	//проверка на столкновение с камнем
 
@@ -107,10 +107,10 @@ void _rockСollision(Rock* _rock, Ball* _ball)
 			}
 };
 
-void _rocksСollision(vector <Rock*>* _rocks, Ball* _ball)
+void _rocksCollision(vector <Rock*>* _rocks, Ball* _ball)
 
 {
 	//колизия с камнем для коллекции камней
 	for (int i = 0; i < _rocks->size(); i++)
-		_rockСollision(_rocks->at(i), _ball);
+		_rockCollision(_rocks->at(i), _ball);
 };

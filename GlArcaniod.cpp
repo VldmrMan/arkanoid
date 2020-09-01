@@ -127,13 +127,13 @@ void Timer(int) {
 	{
 
 		if(
-		_borderСollision(_ball, _kicker, _gamesetting))
+		_borderCollision(_ball, _kicker, _gamesetting))
 		//retry
 		generator(map, _gamesetting->columns, _gamesetting->rows, _gamesetting->wight, _gamesetting->hight);
 
 
-		_kickerСollision(_kicker, _ball);
-		_rocksСollision(map,_ball);
+		_kickerCollision(_kicker, _ball);
+		_rocksCollision(map,_ball);
 
 
 		_ball->move();
